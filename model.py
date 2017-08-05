@@ -3,7 +3,7 @@ import numpy as np
 import xgboost as xgb
 import settings
 
-import sklearn
+from sklearn import *
 from sklearn.base import BaseEstimator
 from sklearn.base import TransformerMixin
 from sklearn.pipeline import Pipeline
@@ -20,8 +20,7 @@ class cust_regression_vals(BaseEstimator, TransformerMixin):
     def fit(self, x, y=None):
         return self
     def transform(self, x):
-        #could use list(df.columns) instead?
-        to_drop = [settings.text_colname, settings.var_colname, settings.gene_colname, settings.id_colname]
+        to_drop = ['ID', 'Text']
         x = x.drop(to_drop,axis=1).values
         return x
 
@@ -38,9 +37,12 @@ if __name__ == '__main__':
     """extract features"""
     train = pd.read_csv(settings.train)
     y = train[settings.y]
+    coldrop = ['Unnamed: 0','Gene','Variation','Variation_type','Gene_type']
     train = train.drop([settings.y], axis=1)
-
+    train = train.drop(coldrop, axis=1)
+    
     test = pd.read_csv(settings.test)
+    test = test.drop(coldrop, axis=1)
     pid = test[settings.id_colname]
 
     feat_p = Pipeline([
@@ -50,7 +52,7 @@ if __name__ == '__main__':
                 ('standard', cust_regression_vals()),
                 ('p1', Pipeline([
                     ('Text', cust_txt_col(settings.text_colname)),
-                    ('tfidf_Text', TfidfVectorizer(ngram_range=(1, 2), )),
+                    ('tfidf_Text', TfidfVectorizer(ngram_range=(1, 2))),
                     ('tsvd', TruncatedSVD(n_components=50, n_iter=25, random_state=12))
                 ]))
             ])
