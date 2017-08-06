@@ -35,7 +35,7 @@ class GetFeatures(object):
     Extract first set of features
     """
 
-if __name__ == '__main__':
+def main():
     feat = GetFeatures()
 
     data_files = [
@@ -51,3 +51,6 @@ if __name__ == '__main__':
         df = feat.lblencoder(df, 'Gene_type')
         df = feat.lblencoder(df, 'Variation_type')
         df.to_csv(output_file, index=False)
+        
+if __name__ == '__main__':
+    main()

@@ -92,7 +92,7 @@ class PrepVar(object):
         df = self.prep_recode(df, colname, gene_dict)
         return df
 
-if __name__ == '__main__':
+def main():
     prep = PrepVar()
     data_files = [
         (settings.var_training_data, settings.var_training_prep),
@@ -104,3 +104,6 @@ if __name__ == '__main__':
         df = prep.prep_variants(df)
         df = prep.prep_genes(df)
         df.to_csv(output_file, index=False)
+        
+if __name__ == '__main__':
+    main()

@@ -38,7 +38,7 @@ class PrepText(object):
         return df
 
 
-if __name__ == '__main__':
+def main():
     """
     remember you need nltk dependencies for first use:
     nltk.download('punkt')  #tokenizer
@@ -64,3 +64,6 @@ if __name__ == '__main__':
         df = prep.normalize_text(df, settings.text_colname, stop)
         df = prep.stem_text(df, settings.text_colname, stemmer)
         df.to_csv(output_file, index=False)
+        
+if __name__ == '__main__':
+    main()

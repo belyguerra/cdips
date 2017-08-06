@@ -4,13 +4,12 @@ import xgboost as xgb
 import settings
 
 from sklearn import *
-from sklearn.base import BaseEstimator
-from sklearn.base import TransformerMixin
-from sklearn.pipeline import Pipeline
-from sklearn.pipeline import FeatureUnion
+from sklearn.base import BaseEstimator, TransformerMixin
+from sklearn.pipeline import Pipeline, FeatureUnion
 from sklearn.decomposition import TruncatedSVD
-from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.feature_extraction.text import TfidfVectorizer, CountVectorizer
 from sklearn.model_selection import train_test_split
+
 
 """
 feature extraction and modeling
@@ -33,7 +32,7 @@ class cust_txt_col(BaseEstimator, TransformerMixin):
         return x[self.key].apply(str)
 
 
-if __name__ == '__main__':
+def main():
     """extract features"""
     train = pd.read_csv(settings.train)
     y = train[settings.y]
@@ -53,7 +52,13 @@ if __name__ == '__main__':
                 ('p1', Pipeline([
                     ('Text', cust_txt_col(settings.text_colname)),
                     ('tfidf_Text', TfidfVectorizer(ngram_range=(1, 2))),
-                    ('tsvd', TruncatedSVD(n_components=50, n_iter=25, random_state=12))
+                    ('tsvd1', TruncatedSVD(n_components=50, n_iter=25, random_state=12)),
+                ('p2', Pipeline([(settings.gene_colname, cust_txt_col(settings.gene_colname)),
+                                 ('count_Gene', CountVectorizer(analyzer=u'char', ngram_range=(1, 8))), 
+                                 ('tsvd2', TruncatedSVD(n_components=20, n_iter=25, random_state=12))])),
+                ('p3', Pipeline([('Variation', cust_txt_col(settings.var_name)), 
+                                 ('count_Variation', CountVectorizer(analyzer=u'char', ngram_range=(1, 8))), 
+                                 ('tsvd3', TruncatedSVD(n_components=20, n_iter=25, random_state=12))])),
                 ]))
             ])
         )])
@@ -107,3 +112,6 @@ if __name__ == '__main__':
     submission = pd.DataFrame(preds, columns=['class' + str(c + 1) for c in range(9)])
     submission[settings.id_colname] = pid
     submission.to_csv('submission_xgb.csv', index=False)
+
+if __name__ == '__main__':
+    main()
